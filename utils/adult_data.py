@@ -1,5 +1,5 @@
 # utf-8
-import const
+import utils.const as const
 
 
 class Adult:

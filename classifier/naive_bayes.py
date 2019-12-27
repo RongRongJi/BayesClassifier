@@ -1,6 +1,6 @@
 # utf-8
 import numpy as np
-import const
+import utils.const as const
 
 
 class AdultSet:

@@ -1,6 +1,6 @@
 # utf-8
-from adult_data import Adult
-from naive_bayes import AdultSet
+from utils.adult_data import Adult
+from classifier.naive_bayes import AdultSet
 import codecs
 
 
