@@ -19,6 +19,7 @@ class Adult:
                 return False, None
         #   移除native-country属性
         self.data[const.NATIVE_COUNTRY] = 0
+        self.data[const.FNLWGT] = 0
         return True, self.data
 
     # 信息打印

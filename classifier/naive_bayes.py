@@ -3,7 +3,7 @@ import numpy as np
 import utils.const as const
 
 
-class AdultSet:
+class NaiveBayes:
     adultSet = []
     attrUnder50KDict = []
     attrAbove50KDict = []
