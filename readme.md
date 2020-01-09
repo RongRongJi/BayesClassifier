@@ -21,9 +21,7 @@ This project will use different Bayesian classifiers to observe the classificati
     * Tree-augmented Naive Bayesian Network
 
 * Project Environment
-    python3
-
-****
+    * python3
 
 ## Usage
 
