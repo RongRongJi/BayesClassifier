@@ -12,10 +12,9 @@ class TanBayes(NaiveBayes):
     def __init__(self, dataSet, lamda):
         NaiveBayes.__init__(self,dataSet,lamda)
         # 对连续型变量进行离散化处理
-        continuous = [const.AGE, const.EDUCATION_NUM,
-                      const.CAPITAL_GAIN, const.CAPITAL_LOSS, const.HOURS_PER_WEEK]
-        group = [10, 10, 15, 15, 15]
-        threshold = [0.01, 0.01, 0, 0, 0]
+        continuous = [const.AGE,const.CAPITAL_GAIN, const.CAPITAL_LOSS, const.HOURS_PER_WEEK]
+        group = [10, 15, 15, 20]
+        threshold = [0, 0, 0, 0]
         self.disc_under50K = dict()
         self.disc_above50K = dict()
         index = 0
@@ -37,7 +36,7 @@ class TanBayes(NaiveBayes):
         print("离散化处理完毕")
         pheromone = self.cal_pheromone()
         print("互信息计算完毕")
-        self.create_mswt(pheromone)
+        self.create_mswt(pheromone,0)
         print("TAN树建立完毕")
         self.probability_precal()
 
@@ -78,24 +77,22 @@ class TanBayes(NaiveBayes):
         for i in range(0, const.IF_OVER_50K):
             for j in range(i + 1, const.IF_OVER_50K):
                 print(i,' ',j,' 互信息计算中...')
-                if i != j and i != const.FNLWGT and j != const.FNLWGT:
+                if i != j and i != const.FNLWGT and j != const.FNLWGT and i != const.NATIVE_COUNTRY and j != const.NATIVE_COUNTRY:
                     # 计算联合分布 / 计算互信息I（Xi,Yj)
                     information_ij = 0
                     # 两者都是连续型变量
-                    if i == const.AGE or i == const.EDUCATION_NUM \
+                    if i == const.AGE\
                             or i == const.CAPITAL_GAIN or i == const.CAPITAL_LOSS or i == const.HOURS_PER_WEEK:
-                        if j == const.AGE or j == const.EDUCATION_NUM \
+                        if j == const.AGE\
                                 or j == const.CAPITAL_GAIN or j == const.CAPITAL_LOSS or j == const.HOURS_PER_WEEK:
                             # Under 50K
                             for ki, vi in self.attrUnder50KDict[i].items():
                                 for kj, vj in self.attrUnder50KDict[j].items():
-                                    part_i = self.disc_under50K[i].classification(float(ki))
-                                    part_j = self.disc_under50K[j].classification(float(kj))
                                     joint_probability = 0
                                     for adult in self.Under50KSet:
                                         ti = self.disc_under50K[i].classification(float(adult[i]))
                                         tj = self.disc_under50K[j].classification(float(adult[j]))
-                                        if ti == part_i and tj == part_j:
+                                        if ti == float(ki) and tj == float(kj):
                                             joint_probability += 1
                                     joint_probability /= self.totalUnder50K
                                     xi_probability = vi / self.totalUnder50K
@@ -106,13 +103,11 @@ class TanBayes(NaiveBayes):
                             # Above 50K
                             for ki, vi in self.attrAbove50KDict[i].items():
                                 for kj, vj in self.attrAbove50KDict[j].items():
-                                    part_i = self.disc_above50K[i].classification(float(ki))
-                                    part_j = self.disc_above50K[j].classification(float(kj))
                                     joint_probability = 0
                                     for adult in self.Above50KSet:
                                         ti = self.disc_above50K[i].classification(float(adult[i]))
                                         tj = self.disc_above50K[j].classification(float(adult[j]))
-                                        if ti == part_i and tj == part_j:
+                                        if ti == float(ki) and tj == float(kj):
                                             joint_probability += 1
                                     joint_probability /= self.totalAbove50K
                                     xi_probability = vi / self.totalAbove50K
@@ -124,11 +119,10 @@ class TanBayes(NaiveBayes):
                         else:
                             for ki, vi in self.attrUnder50KDict[i].items():
                                 for kj, vj in self.attrUnder50KDict[j].items():
-                                    part_i = self.disc_under50K[i].classification(float(ki))
                                     joint_probability = 0
                                     for adult in self.Under50KSet:
                                         ti = self.disc_under50K[i].classification(float(adult[i]))
-                                        if ti == part_i and adult[j] == kj:
+                                        if ti == float(ki) and adult[j] == kj:
                                             joint_probability += 1
                                     joint_probability /= self.totalUnder50K
                                     xi_probability = vi / self.totalUnder50K
@@ -138,11 +132,10 @@ class TanBayes(NaiveBayes):
                                             joint_probability / (xi_probability * xj_probability))
                             for ki, vi in self.attrAbove50KDict[i].items():
                                 for kj, vj in self.attrAbove50KDict[j].items():
-                                    part_i = self.disc_above50K[i].classification(float(ki))
                                     joint_probability = 0
                                     for adult in self.Above50KSet:
                                         ti = self.disc_above50K[i].classification(float(adult[i]))
-                                        if ti == part_i and adult[j] == kj:
+                                        if ti == float(ki) and adult[j] == kj:
                                             joint_probability += 1
                                     joint_probability /= self.totalAbove50K
                                     xi_probability = vi / self.totalAbove50K
@@ -151,15 +144,14 @@ class TanBayes(NaiveBayes):
                                         information_ij += self.priorAbove50K * joint_probability * np.log(
                                             joint_probability / (xi_probability * xj_probability))
                     # i 是离散型 j 是连续型
-                    elif j == const.AGE or j == const.EDUCATION_NUM \
+                    elif j == const.AGE\
                         or j == const.CAPITAL_GAIN or j == const.CAPITAL_LOSS or j == const.HOURS_PER_WEEK:
                         for ki, vi in self.attrUnder50KDict[i].items():
                             for kj, vj in self.attrUnder50KDict[j].items():
-                                part_j = self.disc_under50K[j].classification(float(kj))
                                 joint_probability = 0
                                 for adult in self.Under50KSet:
                                     tj = self.disc_under50K[j].classification(float(adult[j]))
-                                    if tj == part_j and adult[i] == ki and adult[const.IF_OVER_50K] == '<=50K':
+                                    if tj == float(kj) and adult[i] == ki and adult[const.IF_OVER_50K] == '<=50K':
                                         joint_probability += 1
                                 joint_probability /= self.totalUnder50K
                                 xi_probability = vi / self.totalUnder50K
@@ -169,11 +161,10 @@ class TanBayes(NaiveBayes):
                                         joint_probability / (xi_probability * xj_probability))
                         for ki, vi in self.attrAbove50KDict[i].items():
                             for kj, vj in self.attrAbove50KDict[j].items():
-                                part_j = self.disc_above50K[j].classification(float(kj))
                                 joint_probability = 0
                                 for adult in self.Above50KSet:
                                     tj = self.disc_above50K[j].classification(float(adult[j]))
-                                    if tj == part_j and adult[i] == ki:
+                                    if tj == float(kj) and adult[i] == ki:
                                         joint_probability += 1
                                 joint_probability /= self.totalAbove50K
                                 xi_probability = vi / self.totalAbove50K
@@ -207,13 +198,31 @@ class TanBayes(NaiveBayes):
                                 if joint_probability != 0:
                                     information_ij += self.priorAbove50K * joint_probability * np.log(
                                         joint_probability / (xi_probability * xj_probability))
+                    # 归一化处理
+                    # 计算焓变
+                    ent_i = 0
+                    ent_j = 0
+                    for vi in self.attrUnder50KDict[i].values():
+                        prob = vi / self.totalUnder50K
+                        ent_i -= prob * np.log2(prob)
+                    for vj in self.attrUnder50KDict[j].values():
+                        prob = vj / self.totalUnder50K
+                        ent_j -= prob * np.log2(prob)
+                    for vi in self.attrAbove50KDict[i].values():
+                        prob = vi / self.totalAbove50K
+                        ent_i -= prob * np.log2(prob)
+                    for vj in self.attrAbove50KDict[j].values():
+                        prob = vj / self.totalAbove50K
+                        ent_j -= prob * np.log2(prob)
+                    information_ij = information_ij / np.sqrt(ent_i * ent_j)
                     print(i,' ',j,' ',information_ij)
                     pheromone_arr[i][j] = information_ij
                     pheromone_arr[j][i] = information_ij
+        self.pheromone_arr = pheromone_arr
         return pheromone_arr
 
     # 构建最大权生成树
-    def create_mswt(self, pheromone_arr):
+    def create_mswt(self, pheromone_arr, tree_num):
         '''
         1.对于给定的分布P(x)，对于所有的i≠j，计算联合分布P(xi|xj)；
         2.使用第1步得到的概率分布，计算任意两个结点的互信息I(Xi,Yj)，并把I(Xi,Yj)作为这两个结点连接边的权值；
@@ -235,10 +244,10 @@ class TanBayes(NaiveBayes):
         candidate_node = []
         for i in range(1,const.IF_OVER_50K):
             # 去除fnlwgt
-            if i == const.FNLWGT:
+            if i == const.FNLWGT or i == const.NATIVE_COUNTRY:
                 continue
             candidate_node.append(i)
-        while len(candidate_node) > 0:
+        while len(candidate_node) > tree_num:
             max = 0
             tmps = 0
             tmpc = 0
@@ -288,9 +297,9 @@ class TanBayes(NaiveBayes):
             if parent != -1:
                 # Under 50K
                 self.pre_cal_Under50K[i] = {}
-                if i == const.AGE or i == const.EDUCATION_NUM or i == const.CAPITAL_GAIN or i == const.CAPITAL_LOSS \
+                if i == const.AGE or i == const.CAPITAL_GAIN or i == const.CAPITAL_LOSS \
                   or i == const.HOURS_PER_WEEK:
-                    if parent == const.AGE or parent == const.EDUCATION_NUM or parent == const.CAPITAL_GAIN \
+                    if parent == const.AGE or parent == const.CAPITAL_GAIN \
                       or parent == const.CAPITAL_LOSS or parent == const.HOURS_PER_WEEK:
                         for key_i in self.attrUnder50KDict[i]:
                             self.pre_cal_Under50K[i][key_i] = {}
@@ -314,7 +323,7 @@ class TanBayes(NaiveBayes):
                                 total /= self.totalUnder50K
                                 self.pre_cal_Under50K[i][key_i][key_p] = total
                 else:
-                    if parent == const.AGE or parent == const.EDUCATION_NUM or parent == const.CAPITAL_GAIN \
+                    if parent == const.AGE or parent == const.CAPITAL_GAIN \
                       or parent == const.CAPITAL_LOSS or parent == const.HOURS_PER_WEEK:
                         for key_i in self.attrUnder50KDict[i]:
                             self.pre_cal_Under50K[i][key_i] = {}
@@ -338,7 +347,7 @@ class TanBayes(NaiveBayes):
                                 self.pre_cal_Under50K[i][key_i][key_p] = total
                 # Above 50K
                 self.pre_cal_Above50K[i] = {}
-                if i == const.AGE or i == const.EDUCATION_NUM or i == const.CAPITAL_GAIN or i == const.CAPITAL_LOSS \
+                if i == const.AGE or i == const.CAPITAL_GAIN or i == const.CAPITAL_LOSS \
                         or i == const.HOURS_PER_WEEK:
                     if parent == const.AGE or parent == const.EDUCATION_NUM or parent == const.CAPITAL_GAIN \
                             or parent == const.CAPITAL_LOSS or parent == const.HOURS_PER_WEEK:
@@ -364,7 +373,7 @@ class TanBayes(NaiveBayes):
                                 total /= self.totalAbove50K
                                 self.pre_cal_Above50K[i][key_i][key_p] = total
                 else:
-                    if parent == const.AGE or parent == const.EDUCATION_NUM or parent == const.CAPITAL_GAIN \
+                    if parent == const.AGE or parent == const.CAPITAL_GAIN \
                             or parent == const.CAPITAL_LOSS or parent == const.HOURS_PER_WEEK:
                         for key_i in self.attrAbove50KDict[i]:
                             self.pre_cal_Above50K[i][key_i] = {}
@@ -392,7 +401,7 @@ class TanBayes(NaiveBayes):
     def distinguish(self,data):
         under50Krate = 1
         for i in range(0,const.IF_OVER_50K):
-            if i == const.AGE or i == const.EDUCATION_NUM \
+            if i == const.AGE \
                     or i == const.CAPITAL_GAIN or i == const.CAPITAL_LOSS or i == const.HOURS_PER_WEEK:
                 # 查找父类
                 parent = self.parent_label_list[i]
@@ -402,7 +411,7 @@ class TanBayes(NaiveBayes):
                     under50Krate *= (self.attrUnder50KDict[i][part_i] + self.lamda) / (
                         self.totalUnder50K + len(self.laplaceCorrect[i]) * self.lamda)
                 # 有父类 父类是连续型
-                elif parent == const.AGE or parent == const.EDUCATION_NUM \
+                elif parent == const.AGE \
                     or parent == const.CAPITAL_GAIN or parent == const.CAPITAL_LOSS or parent == const.HOURS_PER_WEEK:
                     part_i = self.disc_under50K[i].classification(float(data[i]))
                     part_p = self.disc_under50K[parent].classification(float(data[parent]))
@@ -425,7 +434,7 @@ class TanBayes(NaiveBayes):
                                     self.totalUnder50K + len(self.laplaceCorrect[i]) * self.lamda)
                     else:
                         under50Krate *= self.lamda / (self.totalUnder50K + len(self.laplaceCorrect[i]) * self.lamda)
-                elif parent == const.AGE or parent == const.EDUCATION_NUM \
+                elif parent == const.AGE \
                     or parent == const.CAPITAL_GAIN or parent == const.CAPITAL_LOSS or parent == const.HOURS_PER_WEEK:
                     part_p = self.disc_under50K[parent].classification(float(data[parent]))
                     if data[i] in self.pre_cal_Above50K[i]:
@@ -440,7 +449,7 @@ class TanBayes(NaiveBayes):
             # print('under50Krate:',under50Krate)
         above50Krate = 1
         for i in range(0, const.IF_OVER_50K):
-            if i == const.AGE or i == const.EDUCATION_NUM \
+            if i == const.AGE \
                     or i == const.CAPITAL_GAIN or i == const.CAPITAL_LOSS or i == const.HOURS_PER_WEEK:
                 # 查找父类
                 parent = self.parent_label_list[i]
@@ -450,7 +459,7 @@ class TanBayes(NaiveBayes):
                     above50Krate *= (self.attrAbove50KDict[i][part_i] + self.lamda) / (
                         self.totalAbove50K + len(self.laplaceCorrect[i]) * self.lamda)
                 # 有父类 父类是连续型
-                elif parent == const.AGE or parent == const.EDUCATION_NUM \
+                elif parent == const.AGE \
                         or parent == const.CAPITAL_GAIN or parent == const.CAPITAL_LOSS or parent == const.HOURS_PER_WEEK:
                     part_i = self.disc_above50K[i].classification(float(data[i]))
                     part_p = self.disc_above50K[parent].classification(float(data[parent]))
@@ -473,7 +482,7 @@ class TanBayes(NaiveBayes):
                                 self.totalAbove50K + len(self.laplaceCorrect[i]) * self.lamda)
                     else:
                         above50Krate *= self.lamda / (self.totalAbove50K + len(self.laplaceCorrect[i]) * self.lamda)
-                elif parent == const.AGE or parent == const.EDUCATION_NUM \
+                elif parent == const.AGE \
                         or parent == const.CAPITAL_GAIN or parent == const.CAPITAL_LOSS or parent == const.HOURS_PER_WEEK:
                     part_p = self.disc_above50K[parent].classification(float(data[parent]))
                     if data[i] in self.pre_cal_Above50K[i]:
@@ -488,7 +497,7 @@ class TanBayes(NaiveBayes):
             # print('above50Krate:', above50Krate)
         above50Krate *= self.priorAbove50K
         under50Krate *= self.priorUnder50K
-        print(above50Krate,' ',under50Krate,end=' ')
+        # print(above50Krate,' ',under50Krate,end=' ')
         if above50Krate > under50Krate:
             if data[const.IF_OVER_50K] == '>50K.':
                 return True

@@ -3,6 +3,7 @@ from utils.adult_data import Adult
 from classifier.naive_bayes import NaiveBayes
 from classifier.TAN_bayes import TanBayes
 import codecs
+import numpy as np
 
 
 class Entry:
@@ -45,18 +46,23 @@ class Entry:
         # 生成分类器
         adultCreator = TanBayes(self.adult_data, lamda)
         # 测试数据
-        f = codecs.open('adult-dataset/adult.test', 'r')
-        line = f.readline()
-        total = 0
-        success = 0
-        while line:
-            bool, ret = self.handleclass.dataInit(str(line))
-            if bool == True:
-                total += 1
-                # 测试数据
-                if adultCreator.distinguish(ret) == True:
-                    success += 1
-                print(success, ' / ', total)
+        index = 0
+        while index < 13:
+            f = codecs.open('adult-dataset/adult.test', 'r')
             line = f.readline()
-        print('success rate: ', success / total)
+            total = 0
+            success = 0
+            while line:
+                bool, ret = self.handleclass.dataInit(str(line))
+                if bool == True:
+                    total += 1
+                    # 测试数据
+                    if adultCreator.distinguish(ret) == True:
+                        success += 1
+                    # print(success, ' / ', total)
+                line = f.readline()
+            index += 1
+            adultCreator.create_mswt(adultCreator.pheromone_arr,index)
+            print('index: ', index, 'success rate: ', success / total)
+
 
