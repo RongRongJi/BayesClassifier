@@ -3,7 +3,7 @@ import numpy as np
 import utils.const as const
 
 
-class NaiveBayes:
+class NaiveBayes2:
     adultSet = []
     attrUnder50KDict = []
     attrAbove50KDict = []
@@ -62,9 +62,6 @@ class NaiveBayes:
         # 拉普拉斯修正
         self.priorAbove50K = (self.totalAbove50K+self.lamda) / (total+2*self.lamda)
         self.priorUnder50K = (self.totalUnder50K+self.lamda) / (total+2*self.lamda)
-        # 测试输出
-        # print(self.priorAbove50K)
-        # print(self.priorUnder50K)
 
     # 判别
     def distinguish(self,data):
@@ -72,8 +69,7 @@ class NaiveBayes:
         for i in range(0,const.IF_OVER_50K):
             if i == const.FNLWGT:
                 continue
-            if i == const.AGE \
-                    or i == const.CAPITAL_GAIN or i == const.CAPITAL_LOSS or i == const.HOURS_PER_WEEK:
+            if i == const.AGE or i == const.HOURS_PER_WEEK:
                 average = 0
                 for key, value in self.attrUnder50KDict[i].items():
                     average = average + float(key) * value
@@ -84,6 +80,24 @@ class NaiveBayes:
                 variance = variance / (self.totalUnder50K-1)
                 under50Krate *= 1 / (np.sqrt(2*np.pi*variance)) * np.exp(-(np.power(float(data[i])-average,2))/(2*variance))
                 # print('u=',average,'  xigma2=',variance,'  pi=',math.pi,'  rate=',under50Krate)
+            elif i == const.CAPITAL_GAIN or i == const.CAPITAL_GAIN:
+                construct_zero = self.attrUnder50KDict[i]['-1'] / self.totalUnder50K
+                # 判断是否是结构0
+                if data[i] == '-1':
+                    under50Krate *= construct_zero
+                else:
+                    average = 0
+                    for key, value in self.attrUnder50KDict[i].items():
+                        if key != '-1':
+                            average = average + float(key) * value
+                    average = average / self.totalUnder50K
+                    variance = 0
+                    for key, value in self.attrUnder50KDict[i].items():
+                        if key != '-1':
+                            variance = variance + value * np.power(float(key) - average, 2)
+                    variance = variance / (self.totalUnder50K - 1)
+                    under50Krate *= (1-construct_zero) * 1 / (np.sqrt(2 * np.pi * variance)) * np.exp(
+                        -(np.power(float(data[i]) - average, 2)) / (2 * variance))
             else:
                 # 拉普拉斯修正
                 if data[i] in self.attrUnder50KDict[i]:
@@ -95,8 +109,7 @@ class NaiveBayes:
         for i in range(0, const.IF_OVER_50K):
             if i == const.FNLWGT:
                 continue
-            if i == const.AGE \
-                    or i == const.CAPITAL_GAIN or i == const.CAPITAL_LOSS or i == const.HOURS_PER_WEEK:
+            if i == const.AGE or i == const.HOURS_PER_WEEK:
                 average = 0
                 for key, value in self.attrAbove50KDict[i].items():
                     average = average + float(key) * value
@@ -107,6 +120,24 @@ class NaiveBayes:
                 variance = variance / (self.totalAbove50K-1)
                 above50Krate *= 1 / (np.sqrt(2 * np.pi * variance)) * \
                                 np.power(np.e, -np.power(float(data[i])-average, 2) / (2 * variance))
+            elif i == const.CAPITAL_GAIN or i == const.CAPITAL_GAIN:
+                construct_zero = self.attrAbove50KDict[i]['-1'] / self.totalAbove50K
+                # 判断是否是结构0
+                if data[i] == '-1':
+                    above50Krate *= construct_zero
+                else:
+                    average = 0
+                    for key, value in self.attrAbove50KDict[i].items():
+                        if key != '-1':
+                            average = average + float(key) * value
+                    average = average / self.totalAbove50K
+                    variance = 0
+                    for key, value in self.attrAbove50KDict[i].items():
+                        if key != '-1':
+                            variance = variance + value * np.power(float(key) - average, 2)
+                    variance = variance / (self.totalAbove50K - 1)
+                    above50Krate *= (1-construct_zero) * 1 / (np.sqrt(2 * np.pi * variance)) * np.exp(
+                        -(np.power(float(data[i]) - average, 2)) / (2 * variance))
             else:
                 # 拉普拉斯修正
                 if data[i] in self.attrAbove50KDict[i]:

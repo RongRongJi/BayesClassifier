@@ -46,29 +46,29 @@ class TanBayes(NaiveBayes):
         self.Above50KSet = []
         for arr in self.adultSet:
             if arr[const.IF_OVER_50K] == '<=50K':
-                self.totalUnder50K += 1
+                self.totalUnder50K += float(arr[const.FNLWGT])
                 self.Under50KSet.append(arr)
                 for i in range(0,const.IF_OVER_50K):
                     if arr[i] not in self.attrUnder50KDict[i]:
-                        self.attrUnder50KDict[i][arr[i]] = 1
+                        self.attrUnder50KDict[i][arr[i]] = float(arr[const.FNLWGT])
                     else:
-                        self.attrUnder50KDict[i][arr[i]] += 1
+                        self.attrUnder50KDict[i][arr[i]] += float(arr[const.FNLWGT])
                     if arr[i] not in self.laplaceCorrect[i]:
-                        self.laplaceCorrect[i][arr[i]] = 1
+                        self.laplaceCorrect[i][arr[i]] = float(arr[const.FNLWGT])
                     else:
-                        self.laplaceCorrect[i][arr[i]] += 1
+                        self.laplaceCorrect[i][arr[i]] += float(arr[const.FNLWGT])
             elif arr[const.IF_OVER_50K] == '>50K':
-                self.totalAbove50K += 1
+                self.totalAbove50K += float(arr[const.FNLWGT])
                 self.Above50KSet.append(arr)
                 for i in range(0, const.IF_OVER_50K):
                     if arr[i] not in self.attrAbove50KDict[i]:
-                        self.attrAbove50KDict[i][arr[i]] = 1
+                        self.attrAbove50KDict[i][arr[i]] = float(arr[const.FNLWGT])
                     else:
-                        self.attrAbove50KDict[i][arr[i]] += 1
+                        self.attrAbove50KDict[i][arr[i]] += float(arr[const.FNLWGT])
                     if arr[i] not in self.laplaceCorrect[i]:
-                        self.laplaceCorrect[i][arr[i]] = 1
+                        self.laplaceCorrect[i][arr[i]] = float(arr[const.FNLWGT])
                     else:
-                        self.laplaceCorrect[i][arr[i]] += 1
+                        self.laplaceCorrect[i][arr[i]] += float(arr[const.FNLWGT])
 
     # 计算互信息
     def cal_pheromone(self):
@@ -93,7 +93,7 @@ class TanBayes(NaiveBayes):
                                         ti = self.disc_under50K[i].classification(float(adult[i]))
                                         tj = self.disc_under50K[j].classification(float(adult[j]))
                                         if ti == float(ki) and tj == float(kj):
-                                            joint_probability += 1
+                                            joint_probability += float(adult[const.FNLWGT])
                                     joint_probability /= self.totalUnder50K
                                     xi_probability = vi / self.totalUnder50K
                                     xj_probability = vj / self.totalUnder50K
@@ -108,7 +108,7 @@ class TanBayes(NaiveBayes):
                                         ti = self.disc_above50K[i].classification(float(adult[i]))
                                         tj = self.disc_above50K[j].classification(float(adult[j]))
                                         if ti == float(ki) and tj == float(kj):
-                                            joint_probability += 1
+                                            joint_probability += float(adult[const.FNLWGT])
                                     joint_probability /= self.totalAbove50K
                                     xi_probability = vi / self.totalAbove50K
                                     xj_probability = vj / self.totalAbove50K
@@ -123,7 +123,7 @@ class TanBayes(NaiveBayes):
                                     for adult in self.Under50KSet:
                                         ti = self.disc_under50K[i].classification(float(adult[i]))
                                         if ti == float(ki) and adult[j] == kj:
-                                            joint_probability += 1
+                                            joint_probability += float(adult[const.FNLWGT])
                                     joint_probability /= self.totalUnder50K
                                     xi_probability = vi / self.totalUnder50K
                                     xj_probability = vj / self.totalUnder50K
@@ -136,7 +136,7 @@ class TanBayes(NaiveBayes):
                                     for adult in self.Above50KSet:
                                         ti = self.disc_above50K[i].classification(float(adult[i]))
                                         if ti == float(ki) and adult[j] == kj:
-                                            joint_probability += 1
+                                            joint_probability += float(adult[const.FNLWGT])
                                     joint_probability /= self.totalAbove50K
                                     xi_probability = vi / self.totalAbove50K
                                     xj_probability = vj / self.totalAbove50K
@@ -152,7 +152,7 @@ class TanBayes(NaiveBayes):
                                 for adult in self.Under50KSet:
                                     tj = self.disc_under50K[j].classification(float(adult[j]))
                                     if tj == float(kj) and adult[i] == ki and adult[const.IF_OVER_50K] == '<=50K':
-                                        joint_probability += 1
+                                        joint_probability += float(adult[const.FNLWGT])
                                 joint_probability /= self.totalUnder50K
                                 xi_probability = vi / self.totalUnder50K
                                 xj_probability = vj / self.totalUnder50K
@@ -165,7 +165,7 @@ class TanBayes(NaiveBayes):
                                 for adult in self.Above50KSet:
                                     tj = self.disc_above50K[j].classification(float(adult[j]))
                                     if tj == float(kj) and adult[i] == ki:
-                                        joint_probability += 1
+                                        joint_probability += float(adult[const.FNLWGT])
                                 joint_probability /= self.totalAbove50K
                                 xi_probability = vi / self.totalAbove50K
                                 xj_probability = vj / self.totalAbove50K
@@ -179,7 +179,7 @@ class TanBayes(NaiveBayes):
                                 joint_probability = 0
                                 for adult in self.Under50KSet:
                                     if adult[i] == ki and adult[j] == kj:
-                                        joint_probability += 1
+                                        joint_probability += float(adult[const.FNLWGT])
                                 joint_probability /= self.totalUnder50K
                                 xi_probability = vi / self.totalUnder50K
                                 xj_probability = vj / self.totalUnder50K
@@ -191,7 +191,7 @@ class TanBayes(NaiveBayes):
                                 joint_probability = 0
                                 for adult in self.Above50KSet:
                                     if adult[i] == ki and adult[j] == kj:
-                                        joint_probability += 1
+                                        joint_probability += float(adult[const.FNLWGT])
                                 joint_probability /= self.totalUnder50K
                                 xi_probability = vi / self.totalUnder50K
                                 xj_probability = vj / self.totalUnder50K
@@ -408,21 +408,22 @@ class TanBayes(NaiveBayes):
                 # 无父类
                 if parent == -1:
                     part_i = self.disc_under50K[i].classification(float(data[i]))
-                    under50Krate *= (self.attrUnder50KDict[i][part_i] + self.lamda) / (
-                        self.totalUnder50K + len(self.laplaceCorrect[i]) * self.lamda)
+                    under50Krate *= (self.attrUnder50KDict[i][part_i] + self.lamda) / self.totalUnder50K
                 # 有父类 父类是连续型
                 elif parent == const.AGE \
                     or parent == const.CAPITAL_GAIN or parent == const.CAPITAL_LOSS or parent == const.HOURS_PER_WEEK:
                     part_i = self.disc_under50K[i].classification(float(data[i]))
                     part_p = self.disc_under50K[parent].classification(float(data[parent]))
-                    under50Krate *= self.pre_cal_Under50K[i][part_i][part_p]
+                    prob_parent = self.attrUnder50KDict[parent][part_p] / self.totalUnder50K
+                    under50Krate *= self.pre_cal_Under50K[i][part_i][part_p] / prob_parent
                 # 有父类 父类是离散型
                 else:
                     part_i = self.disc_under50K[i].classification(float(data[i]))
                     if data[parent] in self.pre_cal_Under50K[i][part_i]:
-                        under50Krate *= self.pre_cal_Under50K[i][part_i][data[parent]]
+                        prob_parent = self.attrUnder50KDict[parent][data[parent]] / self.totalUnder50K
+                        under50Krate *= self.pre_cal_Under50K[i][part_i][data[parent]] / prob_parent
                     else:
-                        under50Krate *= self.lamda / (self.totalUnder50K + len(self.laplaceCorrect[i]) * self.lamda)
+                        under50Krate *= self.lamda / self.totalUnder50K
             else:
                 # i 是离散型
                 # 查找父类
@@ -430,22 +431,23 @@ class TanBayes(NaiveBayes):
                 # 无父类
                 if parent == -1:
                     if data[i] in self.attrUnder50KDict[i]:
-                        under50Krate *= (self.attrUnder50KDict[i][data[i]] + self.lamda) / (
-                                    self.totalUnder50K + len(self.laplaceCorrect[i]) * self.lamda)
+                        under50Krate *= (self.attrUnder50KDict[i][data[i]] + self.lamda) / self.totalUnder50K
                     else:
-                        under50Krate *= self.lamda / (self.totalUnder50K + len(self.laplaceCorrect[i]) * self.lamda)
+                        under50Krate *= self.lamda / self.totalUnder50K
                 elif parent == const.AGE \
                     or parent == const.CAPITAL_GAIN or parent == const.CAPITAL_LOSS or parent == const.HOURS_PER_WEEK:
                     part_p = self.disc_under50K[parent].classification(float(data[parent]))
                     if data[i] in self.pre_cal_Above50K[i]:
-                        under50Krate *= self.pre_cal_Under50K[i][data[i]][part_p]
+                        prob_parent = self.attrUnder50KDict[parent][part_p] / self.totalUnder50K
+                        under50Krate *= self.pre_cal_Under50K[i][data[i]][part_p] / prob_parent
                     else:
-                        under50Krate *= self.lamda / (self.totalUnder50K + len(self.laplaceCorrect[i]) * self.lamda)
+                        under50Krate *= self.lamda / self.totalUnder50K
                 else:
                     if data[i] in self.pre_cal_Under50K[i] and data[parent] in self.pre_cal_Under50K[i][data[i]]:
-                        under50Krate *= self.pre_cal_Under50K[i][data[i]][data[parent]]
+                        prob_parent = self.attrUnder50KDict[parent][data[parent]] / self.totalUnder50K
+                        under50Krate *= self.pre_cal_Under50K[i][data[i]][data[parent]] / prob_parent
                     else:
-                        under50Krate *= self.lamda / (self.totalUnder50K + len(self.laplaceCorrect[i]) * self.lamda)
+                        under50Krate *= self.lamda / self.totalUnder50K
             # print('under50Krate:',under50Krate)
         above50Krate = 1
         for i in range(0, const.IF_OVER_50K):
@@ -456,21 +458,22 @@ class TanBayes(NaiveBayes):
                 # 无父类
                 if parent == -1:
                     part_i = self.disc_above50K[i].classification(float(data[i]))
-                    above50Krate *= (self.attrAbove50KDict[i][part_i] + self.lamda) / (
-                        self.totalAbove50K + len(self.laplaceCorrect[i]) * self.lamda)
+                    above50Krate *= (self.attrAbove50KDict[i][part_i] + self.lamda) / self.totalAbove50K
                 # 有父类 父类是连续型
                 elif parent == const.AGE \
                         or parent == const.CAPITAL_GAIN or parent == const.CAPITAL_LOSS or parent == const.HOURS_PER_WEEK:
                     part_i = self.disc_above50K[i].classification(float(data[i]))
                     part_p = self.disc_above50K[parent].classification(float(data[parent]))
-                    above50Krate *= self.pre_cal_Above50K[i][part_i][part_p]
+                    prob_parent = self.attrAbove50KDict[parent][part_p] / self.totalAbove50K
+                    above50Krate *= self.pre_cal_Above50K[i][part_i][part_p] / prob_parent
                 # 有父类 父类是离散型
                 else:
                     part_i = self.disc_above50K[i].classification(float(data[i]))
+                    prob_parent = self.attrAbove50KDict[parent][data[parent]] / self.totalAbove50K
                     if data[parent] in self.pre_cal_Above50K[i][part_i]:
-                        above50Krate *= self.pre_cal_Above50K[i][part_i][data[parent]]
+                        above50Krate *= self.pre_cal_Above50K[i][part_i][data[parent]] / prob_parent
                     else:
-                        above50Krate *= self.lamda / (self.totalAbove50K + len(self.laplaceCorrect[i]) * self.lamda)
+                        above50Krate *= self.lamda / self.totalAbove50K
             else:
                 # i 是离散型
                 # 查找父类
@@ -478,22 +481,23 @@ class TanBayes(NaiveBayes):
                 # 无父类
                 if parent == -1:
                     if data[i] in self.attrAbove50KDict[i]:
-                        above50Krate *= (self.attrAbove50KDict[i][data[i]] + self.lamda) / (
-                                self.totalAbove50K + len(self.laplaceCorrect[i]) * self.lamda)
+                        above50Krate *= (self.attrAbove50KDict[i][data[i]] + self.lamda) / self.totalAbove50K
                     else:
-                        above50Krate *= self.lamda / (self.totalAbove50K + len(self.laplaceCorrect[i]) * self.lamda)
+                        above50Krate *= self.lamda / self.totalAbove50K
                 elif parent == const.AGE \
                         or parent == const.CAPITAL_GAIN or parent == const.CAPITAL_LOSS or parent == const.HOURS_PER_WEEK:
                     part_p = self.disc_above50K[parent].classification(float(data[parent]))
                     if data[i] in self.pre_cal_Above50K[i]:
-                        above50Krate *= self.pre_cal_Above50K[i][data[i]][part_p]
+                        prob_parent = self.attrAbove50KDict[parent][part_p] / self.totalAbove50K
+                        above50Krate *= self.pre_cal_Above50K[i][data[i]][part_p] / prob_parent
                     else:
-                        above50Krate *= self.lamda / (self.totalAbove50K + len(self.laplaceCorrect[i]) * self.lamda)
+                        above50Krate *= self.lamda / self.totalAbove50K
                 else:
                     if data[i] in self.pre_cal_Above50K[i] and data[parent] in self.pre_cal_Above50K[i][data[i]]:
-                        above50Krate *= self.pre_cal_Above50K[i][data[i]][data[parent]]
+                        prob_parent = self.attrAbove50KDict[parent][data[parent]] / self.totalAbove50K
+                        above50Krate *= self.pre_cal_Above50K[i][data[i]][data[parent]] / prob_parent
                     else:
-                        above50Krate *= self.lamda / (self.totalAbove50K + len(self.laplaceCorrect[i]) * self.lamda)
+                        above50Krate *= self.lamda / self.totalAbove50K
             # print('above50Krate:', above50Krate)
         above50Krate *= self.priorAbove50K
         under50Krate *= self.priorUnder50K
