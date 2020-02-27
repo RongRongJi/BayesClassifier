@@ -2,7 +2,7 @@
 import numpy as np
 import utils.const as const
 
-
+# 朴素贝叶斯 连续型变量采取高斯模型进行计算
 class NaiveBayes:
     adultSet = []
     attrUnder50KDict = []

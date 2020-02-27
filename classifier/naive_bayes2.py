@@ -2,7 +2,7 @@
 import numpy as np
 import utils.const as const
 
-
+# 朴素贝叶斯： 连续型变量用零膨胀模型分离零后，采用高斯模型
 class NaiveBayes2:
     adultSet = []
     attrUnder50KDict = []
@@ -80,7 +80,7 @@ class NaiveBayes2:
                 variance = variance / (self.totalUnder50K-1)
                 under50Krate *= 1 / (np.sqrt(2*np.pi*variance)) * np.exp(-(np.power(float(data[i])-average,2))/(2*variance))
                 # print('u=',average,'  xigma2=',variance,'  pi=',math.pi,'  rate=',under50Krate)
-            elif i == const.CAPITAL_GAIN or i == const.CAPITAL_GAIN:
+            elif i == const.CAPITAL_GAIN or i == const.CAPITAL_LOSS:
                 construct_zero = self.attrUnder50KDict[i]['-1'] / self.totalUnder50K
                 # 判断是否是结构0
                 if data[i] == '-1':
@@ -96,7 +96,7 @@ class NaiveBayes2:
                         if key != '-1':
                             variance = variance + value * np.power(float(key) - average, 2)
                     variance = variance / (self.totalUnder50K - 1)
-                    under50Krate *= (1-construct_zero) * 1 / (np.sqrt(2 * np.pi * variance)) * np.exp(
+                    under50Krate *= 1 / (np.sqrt(2 * np.pi * variance)) * np.exp(
                         -(np.power(float(data[i]) - average, 2)) / (2 * variance))
             else:
                 # 拉普拉斯修正
@@ -120,7 +120,7 @@ class NaiveBayes2:
                 variance = variance / (self.totalAbove50K-1)
                 above50Krate *= 1 / (np.sqrt(2 * np.pi * variance)) * \
                                 np.power(np.e, -np.power(float(data[i])-average, 2) / (2 * variance))
-            elif i == const.CAPITAL_GAIN or i == const.CAPITAL_GAIN:
+            elif i == const.CAPITAL_GAIN or i == const.CAPITAL_LOSS:
                 construct_zero = self.attrAbove50KDict[i]['-1'] / self.totalAbove50K
                 # 判断是否是结构0
                 if data[i] == '-1':
@@ -136,7 +136,7 @@ class NaiveBayes2:
                         if key != '-1':
                             variance = variance + value * np.power(float(key) - average, 2)
                     variance = variance / (self.totalAbove50K - 1)
-                    above50Krate *= (1-construct_zero) * 1 / (np.sqrt(2 * np.pi * variance)) * np.exp(
+                    above50Krate *= 1 / (np.sqrt(2 * np.pi * variance)) * np.exp(
                         -(np.power(float(data[i]) - average, 2)) / (2 * variance))
             else:
                 # 拉普拉斯修正

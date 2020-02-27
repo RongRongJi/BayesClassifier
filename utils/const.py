@@ -33,7 +33,7 @@ NATIVE_COUNTRY = 13
 IF_OVER_50K = 14
 
 def is_continuous(num):
-    if num == AGE or num == CAPITAL_GAIN or num == CAPITAL_GAIN or num == HOURS_PER_WEEK:
+    if num == AGE or num == CAPITAL_GAIN or num == CAPITAL_LOSS or num == HOURS_PER_WEEK:
         return True
     else:
         return False

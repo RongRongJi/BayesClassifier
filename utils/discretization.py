@@ -64,7 +64,7 @@ class Discretization:
         # 对0值额外处理
         is_zero = False
         for d in data:
-            if d[0] == 0:
+            if d[0] == -1:
                 is_zero = True
                 break
         if is_zero:
@@ -109,10 +109,14 @@ class Discretization:
 
     # 分类
     def classification(self,num):
+        if num == -1:
+            return 0
         index = -1
         tmp = np.inf
         for i in range(0,len(self.result)):
             aver = self.result[i]["average"]
+            if aver == -1:
+                continue
             if aver > num:
                 t = aver - num
             else:
