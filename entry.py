@@ -35,7 +35,7 @@ class Entry:
                 line = f.readline()
         self.adult_data = adult
 
-    def eva_naive_bayes(self, lamda):
+    def eva_naive_bayes_gau(self, lamda):
         # 生成分类器
         adultCreator = NaiveBayes(self.adult_data, lamda)
         # 测试数据
@@ -59,7 +59,7 @@ class Entry:
             line = f.readline()
         print('under rate: ', under_suc / under_total, '  above rate: ', above_suc / above_total,' total rate:', (under_suc+above_suc)/(under_total+above_total))
 
-    def eva_naive_bayes2(self, lamda):
+    def eva_naive_bayes_zero_inflation(self, lamda):
         # 生成分类器
         adultCreator = NaiveBayes2(self.adult_data, lamda)
         # 测试数据
@@ -83,7 +83,7 @@ class Entry:
             line = f.readline()
         print('under rate: ', under_suc / under_total, '  above rate: ', above_suc / above_total, ' total rate:', (under_suc + above_suc) / (under_total + above_total))
 
-    def eva_tan_bayes(self, lamda):
+    def eva_tan_bayes_discretization(self, lamda):
         # 生成分类器
         adultCreator = TanBayes(self.adult_data, lamda)
         # 测试数据
@@ -123,7 +123,7 @@ class Entry:
             print('index: ', index, 'under rate: ', under_suc / under_total, '  above rate: ', above_suc / above_total)
         fw.close()
 
-    def eva_tan_bayes2(self, lamda):
+    def eva_tan_bayes_zero_inflation(self, lamda):
         # 生成分类器
         adultCreator = TanBayes2(self.adult_data, lamda)
         # 测试数据
