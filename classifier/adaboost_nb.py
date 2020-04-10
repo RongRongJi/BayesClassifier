@@ -1,4 +1,5 @@
 from classifier.naive_bayes3 import NaiveBayes3
+from classifier.semi_nb3 import Semi_Naive_Bayes3
 from classifier.NBTree import NBTree
 import utils.const as const
 from utils.discretization import Discretization
@@ -29,6 +30,7 @@ class Adaboost_Naive_Bayes:
         self.disc = dict()
         group = [10, 30, 30, 15]
         threshold = [0, 0, 0, 0]
+        iso = [[], [0,-1], [0,-1], []]
         index = 0
         for con in continuous:
             sourceData, sourceData = {}, {}
@@ -37,7 +39,7 @@ class Adaboost_Naive_Bayes:
                     sourceData[arr[con]] = float(arr[const.FNLWGT])
                 else:
                     sourceData[arr[con]] += float(arr[const.FNLWGT])
-            dis = Discretization(group=group[index], threshold=threshold[index])
+            dis = Discretization(group=group[index], threshold=threshold[index], isolated=iso[index])
             data = dis.loadData(sourceData)
             dis.train(data)
             dis.set_data()
@@ -67,6 +69,7 @@ class Adaboost_Naive_Bayes:
         for i in range(0, self.m):
             suc_list, fail_list = [], []
             nb = NaiveBayes3(self.adultSet, self.lamda, self.disc)
+            # nb = Semi_Naive_Bayes3(self.adultSet, self.lamda, self.disc)
             err = self.cal_err(nb, suc_list, fail_list)
             alpha = self.alpha(err)
             self.nb_weak.append(nb)
@@ -75,6 +78,9 @@ class Adaboost_Naive_Bayes:
                 data[const.FNLWGT] *= np.exp(-alpha)
             for data in fail_list:
                 data[const.FNLWGT] *= np.exp(alpha)
+                # if data[const.FNLWGT] > 15 and data[const.IF_OVER_50K] == '<=50K':
+                #     data[const.IF_OVER_50K] = '>50K'
+                    # data[const.FNLWGT] = 0
             self.adultSet = suc_list + fail_list
 
     # ADABOOST模型主体： 使用NBTree
@@ -129,26 +135,33 @@ class Adaboost_Naive_Bayes:
                 test_set.append(ret)
             line = f.readline()
         for test in test_set:
+            handleclass.printInfo(test)
             if test[const.IF_OVER_50K] == '<=50K.':
                 self.under_total += 1
                 sign = 0
                 for i in range(0, self.m):
-                    if self.nb_weak[i].distinguish(test, single=True):
+                    if self.nb_weak[i].distinguish(test):
                         sign += self.weak_alpha[i]
                     else:
                         sign -= self.weak_alpha[i]
                 if self.sgn(sign) == 1:
+                    print('\033[0;32m', ' Correct', '\033[0m')
                     self.under_suc += 1
+                else:
+                    print('\033[0;31m', ' Wrong', '\033[0m')
             else:
                 self.above_total += 1
                 sign = 0
                 for i in range(0, self.m):
-                    if self.nb_weak[i].distinguish(test, single=True):
+                    if self.nb_weak[i].distinguish(test):
                         sign += self.weak_alpha[i]
                     else:
                         sign -= self.weak_alpha[i]
                 if self.sgn(sign) == 1:
+                    print('\033[0;32m', ' Correct', '\033[0m')
                     self.above_suc += 1
+                else:
+                    print('\033[0;31m', ' Wrong', '\033[0m')
         print(self.under_total, self.under_suc, self.above_total, self.above_suc)
         print('under rate: ', self.under_suc / self.under_total, '  above rate: ',
               self.above_suc / self.above_total, ' total:'

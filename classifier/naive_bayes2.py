@@ -86,16 +86,17 @@ class NaiveBayes2:
                 if data[i] == '-1':
                     under50Krate *= construct_zero
                 else:
-                    average = 0
+                    average, total = 0, 0
                     for key, value in self.attrUnder50KDict[i].items():
                         if key != '-1':
                             average = average + float(key) * value
-                    average = average / self.totalUnder50K
+                            total += value
+                    average = average / total
                     variance = 0
                     for key, value in self.attrUnder50KDict[i].items():
                         if key != '-1':
                             variance = variance + value * np.power(float(key) - average, 2)
-                    variance = variance / (self.totalUnder50K - 1)
+                    variance = variance / (total - 1)
                     under50Krate *= 1 / (np.sqrt(2 * np.pi * variance)) * np.exp(
                         -(np.power(float(data[i]) - average, 2)) / (2 * variance))
             else:
@@ -126,16 +127,17 @@ class NaiveBayes2:
                 if data[i] == '-1':
                     above50Krate *= construct_zero
                 else:
-                    average = 0
+                    average, total = 0, 0
                     for key, value in self.attrAbove50KDict[i].items():
                         if key != '-1':
                             average = average + float(key) * value
-                    average = average / self.totalAbove50K
+                            total += value
+                    average = average / total
                     variance = 0
                     for key, value in self.attrAbove50KDict[i].items():
                         if key != '-1':
                             variance = variance + value * np.power(float(key) - average, 2)
-                    variance = variance / (self.totalAbove50K - 1)
+                    variance = variance / (total - 1)
                     above50Krate *= 1 / (np.sqrt(2 * np.pi * variance)) * np.exp(
                         -(np.power(float(data[i]) - average, 2)) / (2 * variance))
             else:
@@ -147,7 +149,7 @@ class NaiveBayes2:
             # print('above50Krate:', above50Krate)
         above50Krate *= self.priorAbove50K
         under50Krate *= self.priorUnder50K
-        print(above50Krate,' ',under50Krate,end=' ')
+        # print(above50Krate,' ',under50Krate)
         if above50Krate > under50Krate:
             if data[const.IF_OVER_50K] == '>50K.':
                 return True

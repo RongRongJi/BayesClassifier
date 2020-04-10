@@ -40,6 +40,7 @@ class NBTree:
             self.disc = dict()
             group = [10, 30, 30, 15]
             threshold = [0, 0, 0, 0]
+            iso = [[], [0,-1], [0,-1], []]
             index = 0
             for con in continuous:
                 sourceData, sourceData = {}, {}
@@ -48,7 +49,7 @@ class NBTree:
                         sourceData[arr[con]] = float(arr[const.FNLWGT])
                     else:
                         sourceData[arr[con]] += float(arr[const.FNLWGT])
-                dis = Discretization(group=group[index], threshold=threshold[index])
+                dis = Discretization(group=group[index], threshold=threshold[index], isolated=iso[index])
                 data = dis.loadData(sourceData)
                 dis.train(data)
                 dis.set_data()
@@ -115,7 +116,7 @@ class NBTree:
         for i in range(0, const.IF_OVER_50K):
             if self.select_node[i] == 0:
                 tmp = self.utility(i, node.dataset)
-                print(i,' ',tmp)
+                # print(i,' ',tmp)
                 if tmp > biggest:
                     biggest = tmp
                     index = i
@@ -164,10 +165,10 @@ class NBTree:
         else:
             self.create_tree()
             self.util_dist(self.root, test_set)
-            print(self.under_total, self.under_suc, self.above_total, self.above_suc)
-            print('under rate: ', self.under_suc / self.under_total, '  above rate: ',
-                  self.above_suc / self.above_total, ' total:'
-                  , (self.under_suc + self.above_suc) / (self.under_total + self.above_total))
+            # print(self.under_total, self.under_suc, self.above_total, self.above_suc)
+            # print('under rate: ', self.under_suc / self.under_total, '  above rate: ',
+            #       self.above_suc / self.above_total, ' total:'
+            #       , (self.under_suc + self.above_suc) / (self.under_total + self.above_total))
 
     # 递归调用
     def util_dist(self, node, test_set):
@@ -191,7 +192,7 @@ class NBTree:
     def create_tree(self):
         self.root = Node(-1, -1, -1, self.adultSet, self.disc, self.lamda)
         self.create_node(self.root)
-        print("NBTree构建完成")
+        # print("NBTree构建完成")
 
     # 测试单个样本
     def util_dist_single_sample(self, node, test_data, single=False):

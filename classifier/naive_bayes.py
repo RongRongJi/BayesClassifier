@@ -116,7 +116,7 @@ class NaiveBayes:
             # print('above50Krate:', above50Krate)
         above50Krate *= self.priorAbove50K
         under50Krate *= self.priorUnder50K
-        print(above50Krate,' ',under50Krate,end=' ')
+        # print(above50Krate,' ',under50Krate,end=' ')
         if above50Krate > under50Krate:
             if data[const.IF_OVER_50K] == '>50K.':
                 return True

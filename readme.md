@@ -40,19 +40,19 @@ Adaboost is an iterative algorithm. Its core idea is to train different classfie
 ```python
 from entry import Entry
 entry = Entry()
-entry.read_file(True)   
-entry.eva_naive_bayes_gau(lamda=100)
-entry.eva_naive_bayes_zero_inflation(lamda=10000)
-entry.eva_tan_bayes_discretization(lamda=10000) 
-entry.eva_tan_bayes_zero_inflation(lamda=10000)
-entry.eva_NBTree(lamda=10000)
-entry.eva_adaboost_nb(lamda=1, m=11)
+entry.eva_naive_bayes_gau(lamda=1,flag=False)
+entry.eva_naive_bayes_zero_inflation(lamda=10000, flag=True)
+entry.eva_tan_bayes_discretization(lamda=10000, flag=True)
+entry.eva_tan_bayes_zero_inflation(lamda=10000, flag=True)
+entry.network_bayes(lamda=10000, flag=True, network=[1,3,-1,5,3,-1,-1,1,-1,-1,1,1,9,-1])
+entry.eva_NBTree(lamda=10000, flag=True)
+entry.eva_adaboost_nb(lamda=1, m=8)
 ```
 
 ### Functions
 * `eva_naive_bayes_gau` `Function`<br>
 Naive Bayesian classifier using Gaussian model to deal with continuous variables.<br>
-Parameter: `lamda` Laplace smoothing parameters<br>
+Parameter:`lamda` Laplace smoothing parameters<br>
 * `eva_naive_bayes_zero_inflation` `Function` <br>
 Naive Bayesian classifier using zero-inflation model to deal with continuous variables.<br>
 Parameter: `lamda` Laplace smoothing paramters<br>
@@ -71,12 +71,12 @@ Parameter: `lamda` Laplace smoothing paramters<br>
 `m` iteration times<br>
 
 ### Result
-|Classifier|Accuracy|Precision|Recall|
-|---|---|---|---|
-|Naive Bayes|82.39%|85.36%|92.53%|
-|TAN Bayes|82.74%|89.30%|87.62%|
-|NBTree|82.86%|92.91%|83.67%|
-|adaboost-NB|84.01%|90.42%|88.14%|
+|Classifier|Accuracy|Precision|Recall|G-mean|F-measure|
+|---|---|---|---|---|---|
+|Naive Bayes|82.45%|63.43%|67.46%|76.75%|65.38%|
+|TAN Bayes|82.07%|61.99%|69.84%|77.52%|65.68%|
+|NBTree|83.15%|62.40%|79.09%|81.74%|69.76%|
+|adaboost-NB|83.01%|61.70%|81.27%|82.41%|70.15%|
 
 
 ****

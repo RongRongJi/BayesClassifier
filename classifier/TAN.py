@@ -19,7 +19,7 @@ class TanBayes:
         self.__calAttr__() # 数据处理
         self.probability_precal() # 概率预计算
         self.pheromone_arr = self.cal_pheromone()
-        print("互信息计算完毕")
+        # print("互信息计算完毕")
         self.create_mswt(self.pheromone_arr,0)
 
     # 数据处理
@@ -36,6 +36,7 @@ class TanBayes:
         self.disc_above50K = dict()
         group = [10, 30, 30, 15]
         threshold = [0, 0, 0, 0]
+        iso = [[], [-1], [-1], []]
         index = 0
         for con in continuous:
             under_sourceData, above_sourceData = {}, {}
@@ -50,7 +51,7 @@ class TanBayes:
                         above_sourceData[arr[con]] = float(arr[const.FNLWGT])
                     else:
                         above_sourceData[arr[con]] += float(arr[const.FNLWGT])
-            dis = Discretization(group=group[index], threshold=threshold[index])
+            dis = Discretization(group=group[index], threshold=threshold[index], isolated=iso[index])
             data = dis.loadData(under_sourceData)
             dis.train(data)
             dis.set_data()
@@ -61,8 +62,8 @@ class TanBayes:
             dis.set_data()
             self.disc_above50K[con] = dis
             index += 1
-            print(con, "训练完成")
-        print("离散化处理完毕")
+            # print(con, "训练完成")
+        # print("离散化处理完毕")
 
     # 概率预计算
     def probability_precal(self):
@@ -205,7 +206,7 @@ class TanBayes:
         for i in range(0,const.IF_OVER_50K):
             tmp = self.find_parent(child_label_list,i)
             self.parent_label_list[i] = tmp
-        print("TAN树建立完毕", self.parent_label_list)
+        # print("TAN树建立完毕", self.parent_label_list)
         return self.parent_label_list
 
     # 寻找父节点
@@ -232,7 +233,7 @@ class TanBayes:
         above50Krate = self.util_distinguish(data, True)
         above50Krate *= self.priorAbove50K
         under50Krate *= self.priorUnder50K
-        print(above50Krate,' ',under50Krate,end=' ')
+        # print(above50Krate,' ',under50Krate)
         if above50Krate > under50Krate:
             if data[const.IF_OVER_50K] == '>50K.':
                 return True

@@ -2,11 +2,12 @@ import numpy as np
 
 
 class Discretization:
-    def __init__(self,group, threshold):
+    def __init__(self, group, threshold, isolated=[]):
         self.maxGroup = group
         self.minInfoThreshold = threshold
         self.result = dict()
         self.result.setdefault(0, {})
+        self.isolated = isolated
 
     def loadData(self,sourceData):
         # data = [[1,3],[2,1],[10,4],[240,1],[300,3],[900,5],[5,10]]
@@ -61,24 +62,21 @@ class Discretization:
 
     def train(self,data):
         group = 1
-        # 对0值额外处理
-        is_zero = False
-        for d in data:
-            if d[0] == -1:
-                is_zero = True
-                break
-        if is_zero:
-            sortData = sorted(data, key=lambda d: d[0])
-            self.result[0]["entropy"] = 0
-            self.result[0]["data"] = sortData[:1]
-            self.result[1] = {}
-            self.result[1]["entropy"] = np.inf
-            self.result[1]["data"] = sortData[1:]
-            currentKey = 1
-        else:
-            self.result[0]["entropy"] = np.inf
-            self.result[0]["data"] = data
-            currentKey = 0
+        # 对隔离值额外处理
+        count_iso = 0
+        for iso in self.isolated:
+            for d in data:
+                if d[0] == iso:
+                    self.result[count_iso] = {}
+                    self.result[count_iso]["entropy"] = 0
+                    self.result[count_iso]["data"] = [d]
+                    data.remove(d)
+                    count_iso += 1
+                    break
+        currentKey = count_iso
+        self.result[currentKey] = {}
+        self.result[currentKey]["entropy"] = np.inf
+        self.result[currentKey]["data"] = data
         dic1, dic2, ent = self.splitData(self.result[currentKey]["data"])
         while group < self.maxGroup and ent > self.minInfoThreshold:
             self.result[currentKey] = dic1

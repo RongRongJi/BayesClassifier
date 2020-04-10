@@ -45,8 +45,8 @@ class Adult:
 
     # 信息打印
     def printInfo(self,data):
-        print(data)
-        print(data[const.IF_OVER_50K])
+        # print(data)
+        # print(data[const.IF_OVER_50K])
         for i in range(0,const.IF_OVER_50K+1):
             if i!=const.NATIVE_COUNTRY:
                 print(data[i],end=' ')

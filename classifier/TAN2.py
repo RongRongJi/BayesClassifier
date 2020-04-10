@@ -20,7 +20,7 @@ class TanBayes2:
         self.__continus_pro__(is_above=False)
         self.__continus_pro__(is_above=True) # 连续变量预处理
         self.pheromone_arr = self.cal_pheromone()
-        print("互信息计算完毕")
+        # print("互信息计算完毕")
         self.create_mswt(self.pheromone_arr,0)
 
     # 数据处理
@@ -305,7 +305,7 @@ class TanBayes2:
         for i in range(0,const.IF_OVER_50K):
             tmp = self.find_parent(child_label_list,i)
             self.parent_label_list[i] = tmp
-        print("TAN树建立完毕", self.parent_label_list)
+        # print("TAN树建立完毕", self.parent_label_list)
         return self.parent_label_list
 
     # 寻找父节点
@@ -413,7 +413,7 @@ class TanBayes2:
         above50Krate = self.util_distinguish(data, True)
         above50Krate *= self.priorAbove50K
         under50Krate *= self.priorUnder50K
-        # print(above50Krate,' ',under50Krate,end=' ')
+        # print(above50Krate,' ',under50Krate)
         if above50Krate > under50Krate:
             if data[const.IF_OVER_50K] == '>50K.':
                 return True

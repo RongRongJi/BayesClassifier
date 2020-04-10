@@ -1,4 +1,5 @@
 from classifier.naive_bayes3 import NaiveBayes3
+from classifier.semi_nb3 import Semi_Naive_Bayes3
 import utils.const as const
 
 
@@ -11,7 +12,8 @@ class Node:
         self.node_list = []                     # 子节点
         self.recall_naive_bayes = False         # 是否调用朴素贝叶斯
         self.disc = disc                        # 离散化表
-        self.nb = NaiveBayes3(self.dataset, lamda, self.disc)
+        # self.nb = NaiveBayes3(self.dataset, lamda, self.disc)
+        self.nb = Semi_Naive_Bayes3(self.dataset, lamda, self.disc)
 
     def next_node_list(self, node):
         self.node_list.append(node)
