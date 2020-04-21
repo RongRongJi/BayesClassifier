@@ -165,10 +165,10 @@ class NBTree:
         else:
             self.create_tree()
             self.util_dist(self.root, test_set)
-            # print(self.under_total, self.under_suc, self.above_total, self.above_suc)
-            # print('under rate: ', self.under_suc / self.under_total, '  above rate: ',
-            #       self.above_suc / self.above_total, ' total:'
-            #       , (self.under_suc + self.above_suc) / (self.under_total + self.above_total))
+            print(self.under_total, self.under_suc, self.above_total, self.above_suc)
+            print('under rate: ', self.under_suc / self.under_total, '  above rate: ',
+                self.above_suc / self.above_total, ' total:'
+                , (self.under_suc + self.above_suc) / (self.under_total + self.above_total))
 
     # 递归调用
     def util_dist(self, node, test_set):

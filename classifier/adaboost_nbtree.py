@@ -1,5 +1,3 @@
-from classifier.naive_bayes3 import NaiveBayes3
-from classifier.semi_nb3 import Semi_Naive_Bayes3
 from classifier.NBTree import NBTree
 import utils.const as const
 from utils.discretization import Discretization
@@ -8,7 +6,7 @@ from utils.adult_data import Adult
 import numpy as np
 
 
-class Adaboost_Naive_Bayes:
+class Adaboost_NBTree:
     above_total = 0
     above_suc = 0
     under_total = 0
@@ -64,25 +62,6 @@ class Adaboost_Naive_Bayes:
             data[const.FNLWGT] = float(data[const.FNLWGT])/self.length
         self.adultSet = adult
 
-    # ADABOOST模型主体： 使用朴素贝叶斯
-    def adaboost(self):
-        for i in range(0, self.m):
-            suc_list, fail_list = [], []
-            # nb = NaiveBayes3(self.adultSet, self.lamda, self.disc)
-            nb = Semi_Naive_Bayes3(self.adultSet, self.lamda, self.disc)
-            err = self.cal_err(nb, suc_list, fail_list)
-            alpha = self.alpha(err)
-            self.nb_weak.append(nb)
-            self.weak_alpha.append(alpha)
-            for data in suc_list:
-                data[const.FNLWGT] *= np.exp(-alpha)
-            for data in fail_list:
-                data[const.FNLWGT] *= np.exp(alpha)
-                if data[const.FNLWGT] > 15 and data[const.IF_OVER_50K] == '<=50K':
-                    # data[const.IF_OVER_50K] = '>50K'
-                    data[const.FNLWGT] = 0
-            self.adultSet = suc_list + fail_list
-
     # ADABOOST模型主体： 使用NBTree
     def adaboost_nbtree(self):
         for i in range(0, self.m):
@@ -105,6 +84,9 @@ class Adaboost_Naive_Bayes:
                 data[const.FNLWGT] *= np.exp(-alpha)
             for data in fail_list:
                 data[const.FNLWGT] *= np.exp(alpha)
+                if data[const.FNLWGT] > 30 and data[const.IF_OVER_50K] == '<=50K':
+                    data[const.IF_OVER_50K] = '>50K'
+                    # data[const.FNLWGT] = 0
             self.adultSet = suc_list + fail_list
 
     # 计算错误值
@@ -112,7 +94,7 @@ class Adaboost_Naive_Bayes:
         suc, total = 0, 0
         for data in self.adultSet:
             total += 1
-            if nb.distinguish(data, under_info='<=50K', above_info='>50K'):
+            if nb.distinguish(data, single=True):
                 suc += 1
                 suc_list.append(data)
             else:
@@ -140,7 +122,7 @@ class Adaboost_Naive_Bayes:
                 self.under_total += float(test[const.FNLWGT])
                 sign = 0
                 for i in range(0, self.m):
-                    if self.nb_weak[i].distinguish(test):
+                    if self.nb_weak[i].distinguish(test, single=True):
                         sign += self.weak_alpha[i]
                     else:
                         sign -= self.weak_alpha[i]
@@ -153,7 +135,7 @@ class Adaboost_Naive_Bayes:
                 self.above_total += float(test[const.FNLWGT])
                 sign = 0
                 for i in range(0, self.m):
-                    if self.nb_weak[i].distinguish(test):
+                    if self.nb_weak[i].distinguish(test, single=True):
                         sign += self.weak_alpha[i]
                     else:
                         sign -= self.weak_alpha[i]

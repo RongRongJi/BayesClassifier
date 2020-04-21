@@ -219,6 +219,16 @@ class TanBayes:
                     return i
         return -1
 
+    # 输出祖先结点
+    def find_ancestors(self, node):
+        ancestors = []
+        parent = cur_anc = self.parent_label_list[node]
+        while cur_anc != -1:
+            if cur_anc != parent:
+                ancestors.append(cur_anc)
+            cur_anc = self.parent_label_list[cur_anc]
+        return ancestors
+
     # 生成树
     def util_tree(self,root,matrix,visit,parent_label_list):
         visit[root] = 1
